@@ -1,11 +1,10 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.future import select
 from app.database import get_db
 from app import crud, schemas, models
-from typing import List
 from app.auth import get_current_user
 from app.schemas import UserOut, UserRole, UserUpdateRole
+from typing import List
 
 router = APIRouter(
     prefix="/users",
@@ -66,3 +65,8 @@ async def delete_user(user_id: int, db: AsyncSession = Depends(get_db), current_
     await db.delete(user)
     await db.commit()
     return user
+
+# Получение информации о текущем пользователе
+@router.get("/me", response_model=UserOut)
+async def get_current_user_info(current_user: models.User = Depends(get_current_user)):
+    return current_user
